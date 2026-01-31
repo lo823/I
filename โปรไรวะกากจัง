@@ -1,0 +1,88 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Lunroblox UI", "DarkTheme")
+
+-- // Variables //
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local keys = {
+    "CJ", "sweet", "ryder", "Big smoke", "Kendl Johnson", "Cesar Vialpando", 
+    "Wu Zi Mu", "The Truth", "Zero", "Jizzy B", "T-Bone Mendez", "Mike Toreno", 
+    "Kent Paul", "Maccer", "Madd Dogg", "Ken Rosenberg"
+}
+
+local locations = {
+    Vector3.new(131.46, 3.36, 10.18),
+    Vector3.new(200.00, -2.64, 0.00),
+    Vector3.new(284.00, -2.64, 0.00),
+    Vector3.new(398.00, -2.64, 0.00),
+    Vector3.new(542.00, -2.64, 0.00),
+    Vector3.new(756.00, -2.64, 0.00),
+    Vector3.new(1078.00, -2.64, 0.00),
+    Vector3.new(1568.15, -2.64, 0.80),
+    Vector3.new(2272.69, -2.64, 3.32),
+    Vector3.new(2628.00, -2.64, 0.00)
+}
+
+local currentIndex = 1
+
+-- // Key System Tab //
+local KeyTab = Window:NewTab("Key System")
+local KeySection = KeyTab:NewSection("Enter Key to Continue")
+
+KeySection:NewTextBox("Input Key", "Enter your key here", function(txt)
+    for _, v in pairs(keys) do
+        if txt == v then
+            print("Access Granted!")
+            Library:Notify("Success", "Key Correct! Welcome", 3)
+            -- ปลดล็อคเมนูหลักตรงนี้ (ถ้ามีระบบซ่อน Tab)
+            return
+        end
+    end
+end)
+
+KeySection:NewButton("Key Set (Discord)", "Copy Discord Link", function()
+    setclipboard("https://discord.gg/HcP2unsvw")
+    Library:Notify("Copied", "Discord link copied to clipboard!", 2)
+end)
+
+-- // Teleport Tab //
+local MainTab = Window:NewTab("Teleport Control")
+local MainSection = MainTab:NewSection("Stage Navigation")
+
+-- ฟังก์ชันสำหรับวาร์ป
+local function tp(pos)
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(pos)
+    end
+end
+
+-- ระบบ Reset Index เมื่อตาย
+player.CharacterAdded:Connect(function(char)
+    currentIndex = 1
+    character = char
+    rootPart = char:WaitForChild("HumanoidRootPart")
+    task.wait(0.5)
+    tp(locations[1]) -- วาร์ปไปจุดเริ่มทันทีที่เกิด
+end)
+
+-- ปุ่ม Get Up (ไปข้างหน้า)
+MainSection:NewButton("Get up", "Teleport Forward", function()
+    if currentIndex < #locations then
+        currentIndex = currentIndex + 1
+    else
+        currentIndex = 1 -- วนกลับมาจุดแรกถ้าสุดทาง
+    end
+    tp(locations[currentIndex])
+end)
+
+-- ปุ่ม Get Down (ถอยหลัง)
+MainSection:NewButton("Get down", "Teleport Backward", function()
+    if currentIndex > 1 then
+        currentIndex = currentIndex - 1
+    else
+        currentIndex = #locations -- วนไปจุดสุดท้ายถ้ากดย้อนกลับจากจุดแรก
+    end
+    tp(locations[currentIndex])
+end)
